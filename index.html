@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ραντεβού">
+<meta name="theme-color" content="#ffffff">
+<title>Ραντεβού & Ταμείο</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: quiet and minimal — black ink on white, nothing loud.
+   IDEA: a clean paper diary: one total, one list, nothing extra.
+   PICTURE: the total in a large serif figure, the day's appointments as soft grey cards.
+   COLOUR and TYPE: white, near-black and one baby pink; Noto Serif Display for figures, Inter for text.
+   LAYOUT: one column, summary card, week chips, cards, round + button. */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#111111);--card:light-dark(#f5f5f4,#1c1c1c);--ink:light-dark(#141414,#f2f2f2);
+--mute:light-dark(#8c8c8c,#9a9a9a);--line:light-dark(#e9e9e7,#2a2a2a);--inv:#ffffff;--pink:#f7bfd3;--pinkt:light-dark(#c9778f,#f7bfd3);--onpink:#3a2a30;--pinkbg:light-dark(#fff6f9,#24181d);
+--serif:'Noto Serif Display','GFS Didot',Cardo,Georgia,serif}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip;padding-bottom:120px}
+button{font-family:inherit}
+.wrap{max-width:620px;margin:0 auto;padding:0 18px}
+.hero{margin:calc(14px + env(safe-area-inset-top)) 0 0;border-radius:28px;padding:20px 22px 22px;background:var(--pinkbg)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.brand{font-weight:600;font-size:15px}
+.tabs{display:flex;background:var(--bg);border-radius:999px;padding:4px}
+.tabs button{border:0;background:none;color:var(--mute);font-weight:600;font-size:14px;padding:8px 16px;border-radius:999px;min-height:38px;cursor:pointer}
+.tabs button.on{background:var(--pink);color:var(--onpink)}
+.hrow{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:14px;align-items:center;margin-top:18px}
+.hlab{font-size:14px;color:var(--mute)}
+.big{font:500 clamp(44px,13vw,60px)/1 var(--serif);margin:6px 0 8px;white-space:nowrap}
+.hsub{font-size:14px;color:var(--mute);white-space:nowrap}
+.ring{width:92px;height:92px;position:relative;color:var(--pink)}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring div{position:absolute;inset:0;display:grid;place-content:center;text-align:center;font-size:11px;line-height:1.2;color:var(--mute)}
+.ring b{font:500 20px var(--serif);color:var(--ink)}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.pill{background:var(--bg);border-radius:999px;padding:6px 12px;font-size:13px;white-space:nowrap}
+.pill b{font-weight:600}
+.nav{display:flex;align-items:center;justify-content:space-between;margin:22px 0 10px;gap:8px}
+.nav h2{margin:0;font:500 26px/1.1 var(--serif)}
+.nav small{display:block;color:var(--mute);font-size:13px;margin-top:3px}
+.arrows{display:flex;gap:8px}
+.arrows button{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:20px;cursor:pointer}
+.week{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.week::-webkit-scrollbar{display:none}
+.wd{flex:0 0 auto;width:52px;scroll-snap-align:start;border:0;background:var(--card);border-radius:18px;padding:9px 0 10px;text-align:center;cursor:pointer;color:var(--ink);position:relative}
+.wd span{display:block;font-size:11px;color:var(--mute)}
+.wd b{font:500 19px var(--serif)}
+.wd.has::after{content:"";position:absolute;left:50%;bottom:6px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--pinkt)}
+.wd.on{background:var(--pink);color:var(--onpink)}
+.wd.on span{color:var(--onpink);opacity:.7}.wd.on.has::after{background:var(--onpink)}
+.wd.td:not(.on){box-shadow:inset 0 0 0 1.5px var(--pink)}
+.list{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:8px}
+.ap{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--card);border-radius:20px;padding:14px 16px;cursor:pointer}
+.ap:active{opacity:.7}
+.av{width:42px;height:42px;border-radius:50%;display:grid;place-content:center;font:500 18px var(--serif);background:var(--pinkbg);color:var(--pinkt)}
+.nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meta{color:var(--mute);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meta b{color:var(--ink);font-weight:600}
+.pr{text-align:right;white-space:nowrap}
+.pr b{font:500 19px var(--serif)}
+.tag{display:block;font-size:11px;font-weight:500;margin-top:2px;color:var(--mute)}
+.tag.no{color:var(--pinkt);font-weight:700}
+.empty{text-align:center;color:var(--mute);padding:34px 16px;border-radius:20px;border:1.5px dashed var(--line)}
+.empty b{display:block;font:500 20px var(--serif);color:var(--ink);margin-bottom:4px}
+.demo{margin-top:14px;border-radius:18px;padding:12px 16px;font-size:13px;color:var(--mute);display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;border:1px solid var(--line)}
+.link{border:0;background:none;color:var(--pinkt);font-weight:600;font-size:14px;cursor:pointer;padding:6px 0;min-height:36px;text-decoration:underline;text-underline-offset:3px}
+.sec{background:var(--card);border-radius:22px;padding:18px 18px 12px;margin-top:10px}
+.sec h3{margin:0 0 10px;font:500 19px var(--serif)}
+.bar{display:grid;grid-template-columns:74px minmax(0,1fr) 70px;gap:10px;align-items:center;font-size:14px;padding:6px 0;cursor:pointer}
+.bar .d{color:var(--mute);white-space:nowrap}
+.bar .tr{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar .fl{display:block;height:100%;border-radius:4px;background:var(--pink)}
+.bar .v{text-align:right;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sv{grid-template-columns:minmax(0,1fr) 70px;cursor:default;border-bottom:1px solid var(--line);padding:10px 0}
+.sv:last-child{border:0}
+.sv .n{font-weight:500}.sv .n small{color:var(--mute);margin-left:6px}
+.sv .tr{grid-column:1/-1;order:3}
+.fab{position:fixed;right:max(20px,calc(50% - 290px));bottom:calc(22px + env(safe-area-inset-bottom));width:62px;height:62px;border-radius:50%;border:0;cursor:pointer;
+ background:var(--pink);color:var(--onpink);font-size:32px;line-height:1;box-shadow:0 10px 24px -8px #e9a3bccc;z-index:5}
+.sheet{position:fixed;inset:0;background:#00000066;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center;z-index:9}
+.sheet.on{display:flex}
+.card{background:var(--bg);width:100%;max-width:560px;border-radius:28px 28px 0 0;padding:10px 20px calc(20px + env(safe-area-inset-bottom));max-height:94vh;overflow:auto;animation:up .25s cubic-bezier(.2,.9,.3,1)}
+.card::before{content:"";display:block;width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px}
+@keyframes up{from{transform:translateY(60px);opacity:.3}}
+@media(prefers-reduced-motion:reduce){.card{animation:none}}
+.card h3{margin:0 0 6px;font:500 26px var(--serif)}
+label{display:block;font-size:13px;font-weight:600;color:var(--mute);margin:12px 0 5px}
+input,textarea{width:100%;font:16px Inter,sans-serif;padding:13px 15px;border:1.5px solid transparent;border-radius:14px;background:var(--card);color:var(--ink);min-height:50px}
+input:focus,textarea:focus{outline:0;border-color:var(--pink)}
+button:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.chip{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:7px 13px;font-size:13px;cursor:pointer}
+.price{position:relative}.price input{padding-left:38px;font:500 20px var(--serif)}
+.price::before{content:"€";position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--mute);font-weight:600}
+.paid{display:flex;margin-top:14px;background:var(--card);border-radius:14px;padding:4px}
+.paid button{flex:1;border:0;background:none;border-radius:11px;min-height:44px;font-weight:600;font-size:15px;color:var(--mute);cursor:pointer}
+.paid button.on{background:var(--pink);color:var(--onpink)}
+.btns{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn{flex:1;border:0;border-radius:16px;min-height:54px;font-weight:700;font-size:16px;cursor:pointer;color:var(--onpink);background:var(--pink)}
+.btn.g{background:var(--card);color:var(--ink)}
+.btn.r{flex:0 0 auto;padding:0 18px;background:none;color:var(--ink);border:1px solid var(--line)}
+.err{color:#c62828;font-size:14px;min-height:20px;margin-top:8px}
+.foot{margin-top:28px;padding:18px;border-radius:20px;border:1px solid var(--line);font-size:14px;color:var(--mute)}
+.foot b{color:var(--ink)}
+.foot .btns{margin-top:10px}.foot .btn{min-height:44px;font-size:14px;border-radius:12px}
+.kind{margin:0 0 14px}
+.sub{margin:22px 0 8px;font:500 19px var(--serif)}
+.ap.co .av{background:var(--card);color:var(--mute);border:1px dashed var(--line);font-family:Inter,sans-serif}
+.ap.co{background:var(--bg);border:1px solid var(--line)}
+.pill.net{background:var(--pink);color:var(--onpink)}
+.ledger{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.ledger span{color:var(--mute)}.ledger b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.ledger.tot{border:0;padding-top:12px}.ledger.tot span{color:var(--ink);font-weight:600}.ledger.tot b{font:500 24px var(--serif)}
+textarea.bk{min-height:110px;font-size:12px;margin-top:10px;display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="top">
+      <span class="brand">Ραντεβού & Ταμείο</span>
+      <div class="tabs"><button id="tDay" class="on">Ημέρα</button><button id="tMonth">Μήνας</button></div>
+    </div>
+    <div id="heroBody"></div>
+  </section>
+  <main id="view"></main>
+  <div class="foot">
+    <b>Αντίγραφο ασφαλείας</b><br>Τα στοιχεία μένουν σε αυτό το κινητό. Κράτα αντίγραφο πού και πού.
+    <div class="btns">
+      <button class="btn g" id="exp">Αποθήκευση αντιγράφου</button>
+      <button class="btn g" id="imp">Επαναφορά</button>
+    </div>
+    <input type="file" id="file" accept=".json,application/json" hidden>
+    <textarea class="bk" id="bk" readonly></textarea>
+    <div class="err" id="bkMsg"></div>
+  </div>
+</div>
+<button class="fab" id="addBtn" aria-label="Νέο ραντεβού">+</button>
+
+<div class="sheet" id="sheet">
+  <form class="card" id="form" autocomplete="off" novalidate>
+    <div class="paid kind" id="kind"><button type="button" id="kAp" class="on">Ραντεβού</button><button type="button" id="kCo">Υλικά</button></div>
+    <h3 id="fTitle">Νέο ραντεβού</h3>
+    <div id="gAp">
+      <label for="fName">Όνομα πελάτη</label>
+      <input id="fName">
+      <label for="fSvc">Υπηρεσία</label>
+      <input id="fSvc" placeholder="π.χ. Ημιμόνιμο">
+      <div class="chips" id="svcChips"></div>
+      <div class="row">
+        <div><label for="fDate">Ημερομηνία</label><input type="date" id="fDate"></div>
+        <div><label for="fTime">Ώρα</label><input type="time" id="fTime"></div>
+      </div>
+      <label for="fPrice">Ποσό</label>
+      <div class="price"><input id="fPrice" inputmode="decimal" placeholder="0"></div>
+      <div class="paid"><button type="button" class="y" id="pY">Πληρώθηκε</button><button type="button" class="n" id="pN">Εκκρεμεί</button></div>
+      <label for="fNote">Σημείωση</label>
+      <textarea id="fNote" rows="2"></textarea>
+    </div>
+    <div id="gCo" hidden>
+      <label for="cDesc">Τι αγόρασες</label>
+      <input id="cDesc" placeholder="π.χ. Ημιμόνιμα βερνίκια">
+      <div class="chips" id="costChips"></div>
+      <label for="cDate">Ημερομηνία</label>
+      <input type="date" id="cDate">
+      <label for="cAmt">Κόστος</label>
+      <div class="price"><input id="cAmt" inputmode="decimal" placeholder="0"></div>
+    </div>
+    <div class="err" id="fErr"></div>
+    <div class="btns">
+      <button type="button" class="btn r" id="fDel">Διαγραφή</button>
+      <button type="button" class="btn g" id="fCancel">Άκυρο</button>
+      <button type="submit" class="btn">Αποθήκευση</button>
+    </div>
+  </form>
+</div>
+
+<script>
+{
+const KEY='rantevou-tameio-v1';
+let mem=null;
+const load=()=>{try{const s=localStorage.getItem(KEY);if(s)return JSON.parse(s)}catch(e){}return mem};
+const save=()=>{mem=data;try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}};
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const eur=n=>new Intl.NumberFormat('el-GR',{style:'currency',currency:'EUR',maximumFractionDigits:Math.abs(n||0)%1?2:0}).format(n||0);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>parseFloat(String(v||'0').replace(/\s/g,'').replace(',','.'));
+const DAYS=['Κυριακή','Δευτέρα','Τρίτη','Τετάρτη','Πέμπτη','Παρασκευή','Σάββατο'];
+const DS=['Κυρ','Δευ','Τρί','Τετ','Πέμ','Παρ','Σάβ'];
+const MON=['Ιανουάριος','Φεβρουάριος','Μάρτιος','Απρίλιος','Μάιος','Ιούνιος','Ιούλιος','Αύγουστος','Σεπτέμβριος','Οκτώβριος','Νοέμβριος','Δεκέμβριος'];
+const MONG=['Ιανουαρίου','Φεβρουαρίου','Μαρτίου','Απριλίου','Μαΐου','Ιουνίου','Ιουλίου','Αυγούστου','Σεπτεμβρίου','Οκτωβρίου','Νοεμβρίου','Δεκεμβρίου'];
+const $=id=>document.getElementById(id);
+
+let data=load();
+if(!data){
+  const t=new Date(),off=n=>{const d=new Date(t);d.setDate(t.getDate()-n);return iso(d)};
+  data={items:[
+    {id:'s1',name:'Ελένη Π.',svc:'Ημιμόνιμο',date:off(0),time:'10:00',price:25,paid:true,demo:true},
+    {id:'s2',name:'Κατερίνα',svc:'Τεχνητά νύχια',date:off(0),time:'12:30',price:40,paid:true,demo:true},
+    {id:'s3',name:'Σοφία Μ.',svc:'Πεντικιούρ',date:off(0),time:'17:00',price:30,paid:false,demo:true},
+    {id:'s4',name:'Δήμητρα',svc:'Ημιμόνιμο',date:off(1),time:'11:00',price:25,paid:true,demo:true},
+    {id:'s5',name:'Νίκη',svc:'Συντήρηση',date:off(3),time:'15:30',price:30,paid:true,demo:true}],
+   costs:[
+    {id:'c1',desc:'Λίμες & βαμβάκι',date:off(0),amount:12,demo:true},
+    {id:'c2',desc:'Ημιμόνιμα βερνίκια',date:off(1),amount:36,demo:true}]};
+}
+data.items=data.items||[];data.costs=data.costs||[];
+let mode='day',cur=new Date(),editId=null,kind='ap',paid=true;
+cur.setHours(0,0,0,0);
+
+const sum=a=>a.reduce((s,x)=>s+(+x.price||0),0);
+const csum=a=>a.reduce((s,x)=>s+(+x.amount||0),0);
+const byDay=d=>data.items.filter(x=>x.date===d).sort((a,b)=>a.time.localeCompare(b.time));
+const cDay=d=>data.costs.filter(x=>x.date===d);
+const pre=(y,m)=>y+'-'+pad(m+1);
+const byMonth=(y,m)=>data.items.filter(x=>x.date.startsWith(pre(y,m)));
+const cMonth=(y,m)=>data.costs.filter(x=>x.date.startsWith(pre(y,m))).sort((a,b)=>a.date.localeCompare(b.date));
+
+function ring(p,label){
+  const r=40,c=2*Math.PI*r,pct=Math.round(p*100);
+  return `<div class="ring"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="${r}" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="6"/>
+  <circle cx="48" cy="48" r="${r}" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-dasharray="${c*p} ${c}"/></svg>
+  <div><b>${pct}%</b>${label}</div></div>`;
+}
+function hero(lab,it,co){
+  const tot=sum(it),pd=sum(it.filter(x=>x.paid)),op=tot-pd,mat=csum(co),net=tot-mat;
+  $('heroBody').innerHTML=`<div class="hrow"><div><div class="hlab">${lab} · έσοδα</div><div class="big">${eur(tot)}</div>
+  <div class="hsub">${it.length} ραντεβού${op?' · εκκρεμούν '+eur(op):''}</div></div>
+  ${ring(tot?pd/tot:0,'εισπρ.')}</div>
+  <div class="pills"><span class="pill">Υλικά <b>−${eur(mat)}</b></span><span class="pill net">Καθαρό <b>${eur(net)}</b></span></div>`;
+}
+const costCards=co=>co.length?`<ul class="list">${co.map(x=>`<li class="ap co" data-c="${esc(x.id)}"><span class="av">−</span>
+  <span><div class="nm">${esc(x.desc||'Υλικά')}</div><div class="meta">${parse(x.date).getDate()} ${MONG[parse(x.date).getMonth()]}</div></span>
+  <span class="pr"><b>−${eur(+x.amount)}</b></span></li>`).join('')}</ul>`:'';
+
+function render(){
+  $('tDay').classList.toggle('on',mode==='day');$('tMonth').classList.toggle('on',mode==='month');
+  const hasDemo=data.items.some(x=>x.demo)||data.costs.some(x=>x.demo);
+  const demo=hasDemo?`<div class="demo">Αυτά είναι δείγματα για να δεις πώς δουλεύει.<button class="link" id="clrDemo">Σβήσε το δείγμα</button></div>`:'';
+  const today=iso(new Date());
+  if(mode==='day'){
+    const d=iso(cur),it=byDay(d),co=cDay(d);
+    hero(d===today?'Σήμερα':DAYS[cur.getDay()]+' '+cur.getDate()+'/'+(cur.getMonth()+1),it,co);
+    const st=new Date(cur);st.setDate(cur.getDate()-3);const wk=[];
+    for(let i=0;i<7;i++){const x=new Date(st);x.setDate(st.getDate()+i);wk.push(x)}
+    $('view').innerHTML=`
+    <div class="nav"><div><h2>${DAYS[cur.getDay()]} ${cur.getDate()}</h2><small>${MONG[cur.getMonth()]} ${cur.getFullYear()}${d!==today?' · <button class="link" id="tod" style="min-height:0;padding:0">σήμερα</button>':''}</small></div>
+      <div class="arrows"><button id="prev" aria-label="Προηγούμενη μέρα">‹</button><button id="next" aria-label="Επόμενη μέρα">›</button></div></div>
+    <div class="week">${wk.map(x=>{const k=iso(x);return `<button class="wd${k===d?' on':''}${k===today?' td':''}${byDay(k).length?' has':''}" data-d="${k}"><span>${DS[x.getDay()]}</span><b>${x.getDate()}</b></button>`}).join('')}</div>
+    ${it.length?`<ul class="list">${it.map(x=>`<li class="ap" data-id="${esc(x.id)}"><span class="av">${esc((x.name||'?').trim()[0]||'?')}</span>
+      <span><div class="nm">${esc(x.name)}</div><div class="meta"><b>${esc(x.time)}</b> · ${esc(x.svc||'—')}${x.note?' · '+esc(x.note):''}</div></span>
+      <span class="pr"><b>${eur(+x.price)}</b><span class="tag ${x.paid?'ok':'no'}">${x.paid?'πληρώθηκε':'εκκρεμεί'}</span></span></li>`).join('')}</ul>`
+      :`<div class="empty"><b>Ελεύθερη μέρα</b>Πάτα το + για να βάλεις ραντεβού.</div>`}
+    ${co.length?`<h4 class="sub">Υλικά της ημέρας</h4>${costCards(co)}`:''}
+    ${demo}`;
+    $('prev').onclick=()=>{cur.setDate(cur.getDate()-1);render()};
+    $('next').onclick=()=>{cur.setDate(cur.getDate()+1);render()};
+    if($('tod'))$('tod').onclick=()=>{cur=new Date();cur.setHours(0,0,0,0);render()};
+    document.querySelectorAll('.wd').forEach(b=>b.onclick=()=>{cur=parse(b.dataset.d);render()});
+  }else{
+    const y=cur.getFullYear(),m=cur.getMonth(),it=byMonth(y,m),co=cMonth(y,m),tot=sum(it),mat=csum(co);
+    const days=new Date(y,m+1,0).getDate(),rows=[];
+    for(let i=1;i<=days;i++){const d=pre(y,m)+'-'+pad(i),a=it.filter(x=>x.date===d);if(a.length)rows.push({d,i,s:sum(a)})}
+    hero(MON[m]+' '+y,it,co);
+    const mx=Math.max(1,...rows.map(r=>r.s));
+    const svc={};it.forEach(x=>{const k=x.svc||'Χωρίς υπηρεσία';svc[k]=svc[k]||{n:0,s:0};svc[k].n++;svc[k].s+=+x.price||0});
+    const sv=Object.entries(svc).sort((a,b)=>b[1].s-a[1].s),smx=Math.max(1,...sv.map(s=>s[1].s));
+    $('view').innerHTML=`
+    <div class="nav"><div><h2>${MON[m]}</h2><small>${y} · ${rows.length} μέρες με δουλειά</small></div>
+      <div class="arrows"><button id="prev" aria-label="Προηγούμενος μήνας">‹</button><button id="next" aria-label="Επόμενος μήνας">›</button></div></div>
+    <div class="sec"><h3>Ταμείο μήνα</h3>
+      <div class="ledger"><span>Έσοδα</span><b>${eur(tot)}</b></div>
+      <div class="ledger"><span>Υλικά</span><b>−${eur(mat)}</b></div>
+      <div class="ledger tot"><span>Καθαρό κέρδος</span><b>${eur(tot-mat)}</b></div></div>
+    ${rows.length?`<div class="sec"><h3>Έσοδα ανά ημέρα</h3>${rows.map(r=>`<div class="bar" data-d="${r.d}"><span class="d">${DS[parse(r.d).getDay()]} ${r.i}</span>
+      <span class="tr"><span class="fl" style="width:${r.s/mx*100}%"></span></span><span class="v">${eur(r.s)}</span></div>`).join('')}</div>
+      <div class="sec"><h3>Ανά υπηρεσία</h3>${sv.map(([k,v])=>`<div class="bar sv"><span class="n">${esc(k)}<small>×${v.n}</small></span><span class="v">${eur(v.s)}</span>
+      <span class="tr"><span class="fl" style="width:${v.s/smx*100}%"></span></span></div>`).join('')}</div>`
+      :`<div class="empty"><b>Κανένα ραντεβού</b>Δεν υπάρχουν ραντεβού αυτόν τον μήνα.</div>`}
+    ${co.length?`<h4 class="sub">Αγορές υλικών</h4>${costCards(co)}`:''}
+    ${demo}`;
+    $('prev').onclick=()=>{cur=new Date(y,m-1,1);render()};
+    $('next').onclick=()=>{cur=new Date(y,m+1,1);render()};
+    document.querySelectorAll('.bar[data-d]').forEach(b=>b.onclick=()=>{cur=parse(b.dataset.d);mode='day';render();scrollTo(0,0)});
+  }
+  document.querySelectorAll('.ap[data-id]').forEach(li=>li.onclick=()=>openForm('ap',li.dataset.id));
+  document.querySelectorAll('.ap[data-c]').forEach(li=>li.onclick=()=>openForm('co',li.dataset.c));
+  if($('clrDemo'))$('clrDemo').onclick=()=>{data.items=data.items.filter(x=>!x.demo);data.costs=data.costs.filter(x=>!x.demo);save();render()};
+}
+
+const setPaid=v=>{paid=v;$('pY').classList.toggle('on',v);$('pN').classList.toggle('on',!v)};
+$('pY').onclick=()=>setPaid(true);$('pN').onclick=()=>setPaid(false);
+function setKind(k){
+  kind=k;$('kAp').classList.toggle('on',k==='ap');$('kCo').classList.toggle('on',k==='co');
+  $('gAp').hidden=k!=='ap';$('gCo').hidden=k!=='co';
+  $('fTitle').textContent=editId?'Επεξεργασία':(k==='ap'?'Νέο ραντεβού':'Νέα αγορά υλικών');
+}
+$('kAp').onclick=()=>{if(!editId)setKind('ap')};$('kCo').onclick=()=>{if(!editId)setKind('co')};
+function chips(box,list,onPick){
+  $(box).innerHTML=list.map(s=>`<button type="button" class="chip">${esc(s)}</button>`).join('');
+  $(box).querySelectorAll('.chip').forEach(c=>c.onclick=()=>onPick(c.textContent));
+}
+const topN=(arr,key)=>{const cnt={};arr.forEach(i=>{if(i[key])cnt[i[key]]=(cnt[i[key]]||0)+1});return Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]).slice(0,6)};
+let delArm=false;
+function openForm(k,id){
+  editId=id||null;delArm=false;$('fErr').textContent='';
+  $('kind').style.display=id?'none':'';
+  const x=id?(k==='ap'?data.items:data.costs).find(i=>i.id===id):null;
+  setKind(k);
+  $('fName').value=k==='ap'&&x?x.name:'';$('fSvc').value=k==='ap'&&x?x.svc:'';
+  $('fDate').value=k==='ap'&&x?x.date:iso(cur);$('fTime').value=k==='ap'&&x?x.time:'';
+  $('fPrice').value=k==='ap'&&x?String(x.price).replace('.',','):'';
+  setPaid(k==='ap'&&x?!!x.paid:true);$('fNote').value=k==='ap'&&x?x.note||'':'';
+  $('cDesc').value=k==='co'&&x?x.desc:'';$('cDate').value=k==='co'&&x?x.date:iso(cur);
+  $('cAmt').value=k==='co'&&x?String(x.amount).replace('.',','):'';
+  $('fDel').style.display=x?'':'none';$('fDel').textContent='Διαγραφή';
+  chips('svcChips',topN(data.items,'svc'),v=>{$('fSvc').value=v;
+    if(!$('fPrice').value){const l=[...data.items].reverse().find(i=>i.svc===v);if(l)$('fPrice').value=String(l.price).replace('.',',')}});
+  chips('costChips',topN(data.costs,'desc'),v=>{$('cDesc').value=v});
+  $('sheet').classList.add('on');
+}
+const closeForm=()=>$('sheet').classList.remove('on');
+const newId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+$('form').addEventListener('submit',e=>{
+  e.preventDefault();
+  if(kind==='ap'){
+    const price=num($('fPrice').value);
+    if(!$('fName').value.trim()){$('fErr').textContent='Γράψε όνομα.';return}
+    if(!$('fDate').value||!$('fTime').value){$('fErr').textContent='Βάλε ημερομηνία και ώρα.';return}
+    if(isNaN(price)||price<0){$('fErr').textContent='Το ποσό δεν είναι σωστό.';return}
+    const rec={id:editId||newId(),name:$('fName').value.trim(),svc:$('fSvc').value.trim(),date:$('fDate').value,time:$('fTime').value,
+      price:Math.round(price*100)/100,paid,note:$('fNote').value.trim()};
+    if(editId){const i=data.items.findIndex(x=>x.id===editId);data.items[i]=rec}else data.items.push(rec);
+    cur=parse(rec.date);
+  }else{
+    const amt=num($('cAmt').value);
+    if(!$('cDate').value){$('fErr').textContent='Βάλε ημερομηνία.';return}
+    if(isNaN(amt)||amt<=0){$('fErr').textContent='Γράψε πόσο κόστισε.';return}
+    const rec={id:editId||newId(),desc:$('cDesc').value.trim()||'Υλικά',date:$('cDate').value,amount:Math.round(amt*100)/100};
+    if(editId){const i=data.costs.findIndex(x=>x.id===editId);data.costs[i]=rec}else data.costs.push(rec);
+    cur=parse(rec.date);
+  }
+  save();closeForm();render();
+});
+$('fCancel').onclick=closeForm;
+$('sheet').onclick=e=>{if(e.target.id==='sheet')closeForm()};
+$('fDel').onclick=()=>{
+  if(!delArm){delArm=true;$('fDel').textContent='Σίγουρα;';return}
+  if(kind==='ap')data.items=data.items.filter(x=>x.id!==editId);else data.costs=data.costs.filter(x=>x.id!==editId);
+  save();closeForm();render();
+};
+$('addBtn').onclick=()=>openForm('ap');
+$('tDay').onclick=()=>{mode='day';render()};
+$('tMonth').onclick=()=>{mode='month';render()};
+
+$('exp').onclick=()=>{
+  const txt=JSON.stringify(data);
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));
+    a.download='rantevou-'+iso(new Date())+'.json';document.body.appendChild(a);a.click();a.remove();}catch(e){}
+  $('bk').style.display='block';$('bk').value=txt;
+  $('bkMsg').textContent='Αν δεν κατέβηκε αρχείο, αντίγραψε το κείμενο και φύλαξέ το στις Σημειώσεις.';
+};
+$('imp').onclick=()=>$('file').click();
+$('file').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{const d=JSON.parse(await f.text());if(!Array.isArray(d.items))throw 0;d.costs=d.costs||[];data=d;save();render();$('bkMsg').textContent='Έγινε επαναφορά ('+d.items.length+' ραντεβού, '+d.costs.length+' αγορές υλικών).'}
+  catch(_){$('bkMsg').textContent='Το αρχείο δεν είναι σωστό αντίγραφο.'}
+  e.target.value='';
+};
+render();
+}
+</script>
+</body>
+</html>
