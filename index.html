@@ -22,7 +22,7 @@
 --serif:'Noto Serif Display','GFS Didot',Cardo,Georgia,serif}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip;padding-bottom:120px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip;padding-bottom:40px}
 button{font-family:inherit}
 .wrap{max-width:620px;margin:0 auto;padding:0 18px}
 .hero{margin:calc(14px + env(safe-area-inset-top)) 0 0;border-radius:28px;padding:20px 22px 22px;background:var(--pinkbg)}
@@ -119,6 +119,10 @@ button:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
 .ledger{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
 .ledger span{color:var(--mute)}.ledger b{font-variant-numeric:tabular-nums;white-space:nowrap}
 .ledger.tot{border:0;padding-top:12px}.ledger.tot span{color:var(--ink);font-weight:600}.ledger.tot b{font:500 24px var(--serif)}
+.adds{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:10px;margin:4px 0 14px}
+.addb{border:0;border-radius:18px;min-height:56px;font-weight:700;font-size:16px;cursor:pointer;background:var(--pink);color:var(--onpink);display:flex;align-items:center;justify-content:center;gap:8px}
+.addb span{font-size:24px;font-weight:500;line-height:1}
+.addb.g{background:var(--bg);color:var(--ink);border:1.5px solid var(--pink)}
 textarea.bk{min-height:110px;font-size:12px;margin-top:10px;display:none}
 </style>
 </head>
@@ -143,7 +147,6 @@ textarea.bk{min-height:110px;font-size:12px;margin-top:10px;display:none}
     <div class="err" id="bkMsg"></div>
   </div>
 </div>
-<button class="fab" id="addBtn" aria-label="Νέο ραντεβού">+</button>
 
 <div class="sheet" id="sheet">
   <form class="card" id="form" autocomplete="off" novalidate>
@@ -229,7 +232,7 @@ const cMonth=(y,m)=>data.costs.filter(x=>x.date.startsWith(pre(y,m))).sort((a,b)
 function ring(p,label){
   const r=40,c=2*Math.PI*r,pct=Math.round(p*100);
   return `<div class="ring"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="${r}" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="6"/>
-  <circle cx="48" cy="48" r="${r}" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-dasharray="${c*p} ${c}"/></svg>
+  ${p>0?`<circle cx="48" cy="48" r="${r}" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-dasharray="${c*p} ${c}"/>`:''}</svg>
   <div><b>${pct}%</b>${label}</div></div>`;
 }
 function hero(lab,it,co){
@@ -237,7 +240,7 @@ function hero(lab,it,co){
   $('heroBody').innerHTML=`<div class="hrow"><div><div class="hlab">${lab} · έσοδα</div><div class="big">${eur(tot)}</div>
   <div class="hsub">${it.length} ραντεβού${op?' · εκκρεμούν '+eur(op):''}</div></div>
   ${ring(tot?pd/tot:0,'εισπρ.')}</div>
-  <div class="pills"><span class="pill">Υλικά <b>−${eur(mat)}</b></span><span class="pill net">Καθαρό <b>${eur(net)}</b></span></div>`;
+  <div class="pills"><span class="pill">Υλικά <b>${mat?'−':''}${eur(mat)}</b></span><span class="pill net">Καθαρό <b>${eur(net)}</b></span></div>`;
 }
 const costCards=co=>co.length?`<ul class="list">${co.map(x=>`<li class="ap co" data-c="${esc(x.id)}"><span class="av">−</span>
   <span><div class="nm">${esc(x.desc||'Υλικά')}</div><div class="meta">${parse(x.date).getDate()} ${MONG[parse(x.date).getMonth()]}</div></span>
@@ -254,19 +257,20 @@ function render(){
     const st=new Date(cur);st.setDate(cur.getDate()-3);const wk=[];
     for(let i=0;i<7;i++){const x=new Date(st);x.setDate(st.getDate()+i);wk.push(x)}
     $('view').innerHTML=`
-    <div class="nav"><div><h2>${DAYS[cur.getDay()]} ${cur.getDate()}</h2><small>${MONG[cur.getMonth()]} ${cur.getFullYear()}${d!==today?' · <button class="link" id="tod" style="min-height:0;padding:0">σήμερα</button>':''}</small></div>
+    <div class="nav"><div><h2>${DAYS[cur.getDay()]} ${cur.getDate()}</h2><small>${MONG[cur.getMonth()]} ${cur.getFullYear()}</small></div>
       <div class="arrows"><button id="prev" aria-label="Προηγούμενη μέρα">‹</button><button id="next" aria-label="Επόμενη μέρα">›</button></div></div>
     <div class="week">${wk.map(x=>{const k=iso(x);return `<button class="wd${k===d?' on':''}${k===today?' td':''}${byDay(k).length?' has':''}" data-d="${k}"><span>${DS[x.getDay()]}</span><b>${x.getDate()}</b></button>`}).join('')}</div>
+    <div class="adds"><button class="addb" id="addAp"><span>+</span> Ραντεβού</button><button class="addb g" id="addCo"><span>+</span> Υλικά</button></div>
     ${it.length?`<ul class="list">${it.map(x=>`<li class="ap" data-id="${esc(x.id)}"><span class="av">${esc((x.name||'?').trim()[0]||'?')}</span>
       <span><div class="nm">${esc(x.name)}</div><div class="meta"><b>${esc(x.time)}</b> · ${esc(x.svc||'—')}${x.note?' · '+esc(x.note):''}</div></span>
       <span class="pr"><b>${eur(+x.price)}</b><span class="tag ${x.paid?'ok':'no'}">${x.paid?'πληρώθηκε':'εκκρεμεί'}</span></span></li>`).join('')}</ul>`
-      :`<div class="empty"><b>Ελεύθερη μέρα</b>Πάτα το + για να βάλεις ραντεβού.</div>`}
+      :''}
     ${co.length?`<h4 class="sub">Υλικά της ημέρας</h4>${costCards(co)}`:''}
     ${demo}`;
     $('prev').onclick=()=>{cur.setDate(cur.getDate()-1);render()};
     $('next').onclick=()=>{cur.setDate(cur.getDate()+1);render()};
-    if($('tod'))$('tod').onclick=()=>{cur=new Date();cur.setHours(0,0,0,0);render()};
     document.querySelectorAll('.wd').forEach(b=>b.onclick=()=>{cur=parse(b.dataset.d);render()});
+    $('addAp').onclick=()=>openForm('ap');$('addCo').onclick=()=>openForm('co');
   }else{
     const y=cur.getFullYear(),m=cur.getMonth(),it=byMonth(y,m),co=cMonth(y,m),tot=sum(it),mat=csum(co);
     const days=new Date(y,m+1,0).getDate(),rows=[];
@@ -280,7 +284,7 @@ function render(){
       <div class="arrows"><button id="prev" aria-label="Προηγούμενος μήνας">‹</button><button id="next" aria-label="Επόμενος μήνας">›</button></div></div>
     <div class="sec"><h3>Ταμείο μήνα</h3>
       <div class="ledger"><span>Έσοδα</span><b>${eur(tot)}</b></div>
-      <div class="ledger"><span>Υλικά</span><b>−${eur(mat)}</b></div>
+      <div class="ledger"><span>Υλικά</span><b>${mat?'−':''}${eur(mat)}</b></div>
       <div class="ledger tot"><span>Καθαρό κέρδος</span><b>${eur(tot-mat)}</b></div></div>
     ${rows.length?`<div class="sec"><h3>Έσοδα ανά ημέρα</h3>${rows.map(r=>`<div class="bar" data-d="${r.d}"><span class="d">${DS[parse(r.d).getDay()]} ${r.i}</span>
       <span class="tr"><span class="fl" style="width:${r.s/mx*100}%"></span></span><span class="v">${eur(r.s)}</span></div>`).join('')}</div>
@@ -359,7 +363,6 @@ $('fDel').onclick=()=>{
   if(kind==='ap')data.items=data.items.filter(x=>x.id!==editId);else data.costs=data.costs.filter(x=>x.id!==editId);
   save();closeForm();render();
 };
-$('addBtn').onclick=()=>openForm('ap');
 $('tDay').onclick=()=>{mode='day';render()};
 $('tMonth').onclick=()=>{mode='month';render()};
 
