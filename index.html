@@ -26,8 +26,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-u
 button{font-family:inherit}
 .wrap{max-width:620px;margin:0 auto;padding:0 18px}
 .hero{margin:calc(14px + env(safe-area-inset-top)) 0 0;border-radius:28px;padding:20px 22px 22px;background:var(--pinkbg)}
-.top{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.brand{font-weight:600;font-size:15px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{font:500 24px/1.1 var(--serif);white-space:nowrap;flex:none}.brand span{display:block;font:400 16px/1.4 Inter,sans-serif;letter-spacing:.04em}
 .tabs{display:flex;background:var(--bg);border-radius:999px;padding:4px}
 .tabs button{border:0;background:none;color:var(--mute);font-weight:600;font-size:14px;padding:8px 16px;border-radius:999px;min-height:38px;cursor:pointer}
 .tabs button.on{background:var(--pink);color:var(--onpink)}
@@ -130,7 +130,7 @@ textarea.bk{min-height:110px;font-size:12px;margin-top:10px;display:none}
 <div class="wrap">
   <section class="hero">
     <div class="top">
-      <span class="brand">Polish &amp; Profit<br><span style="font-weight:400;color:var(--mute)">Agenda</span></span>
+      <span class="brand">Polish &amp; Profit<span style="color:var(--mute)">Agenda</span></span>
       <div class="tabs"><button id="tDay" class="on">Ημέρα</button><button id="tMonth">Μήνας</button></div>
     </div>
     <div id="heroBody"></div>
